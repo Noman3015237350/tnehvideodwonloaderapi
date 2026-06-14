@@ -14,7 +14,6 @@ app.use(express.static('public'));
 
 // API Keys storage (in production, use database)
 const validKeys = new Map();
-const KEY_EXPIRY_DAYS = 30;
 
 // Generate API Key
 function generateApiKey() {
@@ -105,7 +104,8 @@ app.get('/api/health', (req, res) => {
     status: 'active',
     timestamp: new Date().toISOString(),
     endpoints: [
-      '/api/createkey',
+      '/api/expiredate=7&createkey',
+      '/api/expiredate=30&createkey',
       '/api/TikTok?key=&url=',
       '/api/Facebook?key=&url=',
       '/api/Instagram?key=&url=',
@@ -114,17 +114,20 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Create API Key
-app.get('/api/createkey', (req, res) => {
-  const { expiredate } = req.query;
-  const apiKey = generateApiKey();
+// Create API Key with expiredate parameter
+app.get('/api/expiredate=:days&createkey', (req, res) => {
+  const days = parseInt(req.params.days);
   
-  let expiryDate = new Date();
-  if (expiredate && !isNaN(parseInt(expiredate))) {
-    expiryDate.setDate(expiryDate.getDate() + parseInt(expiredate));
-  } else {
-    expiryDate.setDate(expiryDate.getDate() + KEY_EXPIRY_DAYS);
+  if (isNaN(days) || days <= 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid expiredate. Please provide a positive number of days'
+    });
   }
+  
+  const apiKey = generateApiKey();
+  const expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + days);
   
   validKeys.set(apiKey, expiryDate);
   
@@ -132,7 +135,32 @@ app.get('/api/createkey', (req, res) => {
     success: true,
     api_key: apiKey,
     expiry_date: expiryDate.toISOString(),
-    message: 'Store this API key securely'
+    valid_days: days,
+    message: `API key generated successfully. Valid for ${days} days.`
+  });
+});
+
+// Alternative: Support both formats (for backward compatibility)
+app.get('/api/createkey', (req, res) => {
+  const { expiredate } = req.query;
+  let days = 30; // default
+  
+  if (expiredate && !isNaN(parseInt(expiredate))) {
+    days = parseInt(expiredate);
+  }
+  
+  const apiKey = generateApiKey();
+  const expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + days);
+  
+  validKeys.set(apiKey, expiryDate);
+  
+  res.json({
+    success: true,
+    api_key: apiKey,
+    expiry_date: expiryDate.toISOString(),
+    valid_days: days,
+    message: `API key generated successfully. Valid for ${days} days.`
   });
 });
 
