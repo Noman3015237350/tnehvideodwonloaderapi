@@ -3,392 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TNEH Social Media Video Downloader</title>
+    <title>TNEH Video Downloader API</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-
+        
         .header {
             text-align: center;
             color: white;
             margin-bottom: 40px;
         }
-
+        
         .header h1 {
-            font-size: 3rem;
+            font-size: 3em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
-
+        
         .header p {
-            font-size: 1.2rem;
+            font-size: 1.2em;
             opacity: 0.9;
         }
-
+        
         .card {
             background: white;
-            border-radius: 20px;
+            border-radius: 10px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-
-        .api-key-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .input-group {
+        
+        .card h2 {
+            color: #667eea;
             margin-bottom: 20px;
         }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
+        
+        .endpoint {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-family: monospace;
         }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
+        
+        .endpoint-url {
+            color: #667eea;
+            font-weight: bold;
         }
-
-        input:focus {
-            outline: none;
-            border-color: #667eea;
+        
+        .method {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-right: 10px;
         }
-
+        
+        input, button {
+            padding: 10px 15px;
+            margin: 10px 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        
+        input {
+            width: 300px;
+        }
+        
         button {
             background: #667eea;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
-
+        
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-
-        button:active {
-            transform: translateY(0);
-        }
-
+        
         .result {
             margin-top: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
             display: none;
         }
-
+        
         .result.show {
             display: block;
-            animation: fadeIn 0.5s;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .video-preview {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        video, img {
-            max-width: 100%;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-
-        .download-btn {
-            display: inline-block;
-            margin-top: 15px;
-            background: #28a745;
-        }
-
+        
         .error {
-            color: #dc3545;
-            padding: 10px;
-            background: #f8d7da;
-            border-radius: 10px;
-            margin-top: 10px;
+            color: red;
         }
-
+        
         .success {
-            color: #155724;
-            background: #d4edda;
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 10px;
+            color: green;
         }
-
-        .endpoint-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .endpoint-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .endpoint-item strong {
-            color: #667eea;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .endpoint-item code {
-            font-size: 12px;
-            word-break: break-all;
-        }
-
-        .loading {
-            display: none;
+        
+        .footer {
             text-align: center;
-            padding: 20px;
+            color: white;
+            margin-top: 40px;
         }
-
-        .loading.show {
-            display: block;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        
         @media (max-width: 768px) {
-            .header h1 { font-size: 2rem; }
-            .card { padding: 20px; }
+            input {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎥 TNEH Video Downloader</h1>
+            <h1>🎥 TNEH Video Downloader API</h1>
             <p>Download videos from TikTok, Facebook, Instagram, and YouTube</p>
         </div>
-
-        <div class="card api-key-section">
+        
+        <div class="card">
+            <h2>📋 API Endpoints</h2>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="endpoint-url">/api/health</span>
+                <p>Check API health status</p>
+            </div>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="endpoint-url">/api/createkey?expiredate=30</span>
+                <p>Generate API key (expires in days, default 30)</p>
+            </div>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="endpoint-url">/api/TikTok?key=YOUR_KEY&url=VIDEO_URL</span>
+                <p>Download TikTok video</p>
+            </div>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="endpoint-url">/api/Facebook?key=YOUR_KEY&url=VIDEO_URL</span>
+                <p>Download Facebook video</p>
+            </div>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="endpoint-url">/api/Instagram?key=YOUR_KEY&url=VIDEO_URL</span>
+                <p>Download Instagram video</p>
+            </div>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="endpoint-url">/api/YouTube?key=YOUR_KEY&url=VIDEO_URL</span>
+                <p>Download YouTube video</p>
+            </div>
+        </div>
+        
+        <div class="card">
             <h2>🔑 Get Your API Key</h2>
-            <p>Get a free API key to start downloading videos</p>
-            <button onclick="getApiKey()" style="background: white; color: #667eea; margin-top: 15px;">Get API Key</button>
-            <div id="apiKeyResult"></div>
+            <button onclick="getApiKey()">Generate API Key</button>
+            <div id="keyResult" class="result"></div>
         </div>
-
+        
         <div class="card">
-            <h2>📥 Download Video</h2>
-            <div class="input-group">
-                <label>Platform</label>
-                <select id="platform">
-                    <option value="TikTok">TikTok</option>
-                    <option value="Facebook">Facebook</option>
-                    <option value="Instagram">Instagram</option>
-                    <option value="YouTube">YouTube</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>API Key</label>
-                <input type="text" id="apiKey" placeholder="Enter your API key">
-            </div>
-            <div class="input-group">
-                <label>Video URL</label>
-                <input type="text" id="videoUrl" placeholder="Paste video URL here">
-            </div>
+            <h2>📥 Test Download</h2>
+            <select id="platform" style="padding: 10px; margin: 10px 5px;">
+                <option value="TikTok">TikTok</option>
+                <option value="Facebook">Facebook</option>
+                <option value="Instagram">Instagram</option>
+                <option value="YouTube">YouTube</option>
+            </select>
+            <input type="text" id="apiKey" placeholder="Your API Key">
+            <input type="text" id="videoUrl" placeholder="Video URL">
             <button onclick="downloadVideo()">Download Video</button>
-            
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Processing your request...</p>
-            </div>
-            
-            <div id="result" class="result"></div>
+            <div id="downloadResult" class="result"></div>
         </div>
-
-        <div class="card">
-            <h2>📚 API Endpoints</h2>
-            <div class="endpoint-grid">
-                <div class="endpoint-item">
-                    <strong>Create Key</strong>
-                    <code>POST /api/createkey</code>
-                </div>
-                <div class="endpoint-item">
-                    <strong>TikTok</strong>
-                    <code>GET /api/TikTok?key={KEY}&url={URL}</code>
-                </div>
-                <div class="endpoint-item">
-                    <strong>Facebook</strong>
-                    <code>GET /api/Facebook?key={KEY}&url={URL}</code>
-                </div>
-                <div class="endpoint-item">
-                    <strong>Instagram</strong>
-                    <code>GET /api/Instagram?key={KEY}&url={URL}</code>
-                </div>
-                <div class="endpoint-item">
-                    <strong>YouTube</strong>
-                    <code>GET /api/YouTube?key={KEY}&url={URL}</code>
-                </div>
-                <div class="endpoint-item">
-                    <strong>Health</strong>
-                    <code>GET /api/health</code>
-                </div>
-            </div>
+        
+        <div class="footer">
+            <p>© 2024 TNEH Video Downloader API | Powered by Node.js</p>
         </div>
     </div>
-
+    
     <script>
         const API_BASE = 'https://tnehvideodwonloaderapi.onrender.com';
-
+        
         async function getApiKey() {
+            const resultDiv = document.getElementById('keyResult');
             try {
-                const response = await fetch(`${API_BASE}/api/createkey`, {
-                    method: 'POST'
-                });
+                const response = await fetch(`${API_BASE}/api/createkey?expiredate=30`);
                 const data = await response.json();
                 
-                document.getElementById('apiKeyResult').innerHTML = `
-                    <div class="success">
-                        <strong>Your API Key:</strong><br>
-                        <code style="font-size: 18px; word-break: break-all;">${data.api_key}</code>
-                        <br><br>
-                        <strong>Daily Limit:</strong> ${data.daily_limit} requests<br>
-                        <strong>Save this key!</strong> You'll need it for downloading videos.
-                    </div>
-                `;
-                
-                document.getElementById('apiKey').value = data.api_key;
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ API Key Generated Successfully!</strong><br>
+                            <strong>Key:</strong> ${data.api_key}<br>
+                            <strong>Expires:</strong> ${new Date(data.expiry_date).toLocaleString()}<br>
+                            <small>⚠️ Save this key securely. You won't see it again!</small>
+                        </div>
+                    `;
+                    document.getElementById('apiKey').value = data.api_key;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Failed to generate API key</div>`;
+                }
+                resultDiv.classList.add('show');
             } catch (error) {
-                document.getElementById('apiKeyResult').innerHTML = `
-                    <div class="error">Error getting API key: ${error.message}</div>
-                `;
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                resultDiv.classList.add('show');
             }
         }
-
+        
         async function downloadVideo() {
             const platform = document.getElementById('platform').value;
-            const apiKey = document.getElementById('apiKey').value.trim();
-            const videoUrl = document.getElementById('videoUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value;
+            const videoUrl = document.getElementById('videoUrl').value;
+            const resultDiv = document.getElementById('downloadResult');
             
             if (!apiKey || !videoUrl) {
-                showResult('Please enter both API key and video URL', 'error');
+                resultDiv.innerHTML = `<div class="error">❌ Please provide both API Key and Video URL</div>`;
+                resultDiv.classList.add('show');
                 return;
             }
             
-            // Show loading
-            document.getElementById('loading').classList.add('show');
-            document.getElementById('result').classList.remove('show');
+            resultDiv.innerHTML = `<div>⏳ Downloading video...</div>`;
+            resultDiv.classList.add('show');
             
             try {
-                const response = await fetch(`${API_BASE}/api/${platform}?key=${apiKey}&url=${encodeURIComponent(videoUrl)}`);
+                const response = await fetch(`${API_BASE}/api/${platform}?key=${encodeURIComponent(apiKey)}&url=${encodeURIComponent(videoUrl)}`);
                 const data = await response.json();
                 
-                if (data.error) {
-                    showResult(data.error, 'error');
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Download Successful!</strong><br>
+                            <strong>Platform:</strong> ${data.platform}<br>
+                            <strong>Data:</strong> <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                        </div>
+                    `;
                 } else {
-                    displayVideoResult(data);
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${data.error}</div>`;
                 }
             } catch (error) {
-                showResult(`Error: ${error.message}`, 'error');
-            } finally {
-                document.getElementById('loading').classList.remove('show');
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
             }
         }
-        
-        function displayVideoResult(data) {
-            const downloadUrl = data.download_url || (data.data && data.data.url);
-            
-            let html = `
-                <div class="success">
-                    <strong>✅ Success!</strong><br>
-                    Platform: ${data.platform}<br>
-                </div>
-                <div class="video-preview">
-            `;
-            
-            if (downloadUrl) {
-                if (downloadUrl.match(/\.(mp4|webm|mov)$/i)) {
-                    html += `
-                        <video controls src="${downloadUrl}" style="max-width: 100%;"></video>
-                        <br>
-                        <a href="${downloadUrl}" download class="download-btn" style="display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
-                            ⬇️ Download Video
-                        </a>
-                    `;
-                } else {
-                    html += `
-                        <a href="${downloadUrl}" target="_blank" class="download-btn" style="display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-                            🔗 Open Video Link
-                        </a>
-                    `;
-                }
-            }
-            
-            html += `<pre style="margin-top: 15px; background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto;">${JSON.stringify(data, null, 2)}</pre>`;
-            html += `</div>`;
-            
-            showResult(html, 'success');
-        }
-        
-        function showResult(message, type) {
-            const resultDiv = document.getElementById('result');
-            if (type === 'error') {
-                resultDiv.innerHTML = `<div class="error">${message}</div>`;
-            } else {
-                resultDiv.innerHTML = message;
-            }
-            resultDiv.classList.add('show');
-        }
-        
-        // Enter key support
-        document.getElementById('videoUrl').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                downloadVideo();
-            }
-        });
     </script>
 </body>
 </html>
