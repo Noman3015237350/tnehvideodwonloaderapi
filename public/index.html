@@ -75,7 +75,7 @@
             margin-right: 10px;
         }
         
-        input, button {
+        input, select, button {
             padding: 10px 15px;
             margin: 10px 5px;
             border: 1px solid #ddd;
@@ -85,6 +85,11 @@
         
         input {
             width: 300px;
+        }
+        
+        select {
+            background: white;
+            cursor: pointer;
         }
         
         button {
@@ -105,6 +110,7 @@
             background: #f9f9f9;
             border-radius: 5px;
             display: none;
+            overflow-x: auto;
         }
         
         .result.show {
@@ -119,10 +125,25 @@
             color: green;
         }
         
+        .key-badge {
+            background: #e0e7ff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+        
         .footer {
             text-align: center;
             color: white;
             margin-top: 40px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
         @media (max-width: 768px) {
@@ -148,8 +169,13 @@
             </div>
             <div class="endpoint">
                 <span class="method">GET</span>
-                <span class="endpoint-url">/api/createkey?expiredate=30</span>
-                <p>Generate API key (expires in days, default 30)</p>
+                <span class="endpoint-url">/api/expiredate=7&createkey</span>
+                <p>Generate API key (valid for 7 days)</p>
+            </div>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="endpoint-url">/api/expiredate=30&createkey</span>
+                <p>Generate API key (valid for 30 days)</p>
             </div>
             <div class="endpoint">
                 <span class="method">GET</span>
@@ -175,7 +201,10 @@
         
         <div class="card">
             <h2>🔑 Get Your API Key</h2>
-            <button onclick="getApiKey()">Generate API Key</button>
+            <div class="button-group">
+                <button onclick="getApiKey(7)">Generate Key (7 days)</button>
+                <button onclick="getApiKey(30)">Generate Key (30 days)</button>
+            </div>
             <div id="keyResult" class="result"></div>
         </div>
         
@@ -201,24 +230,25 @@
     <script>
         const API_BASE = 'https://tnehvideodwonloaderapi.onrender.com';
         
-        async function getApiKey() {
+        async function getApiKey(days) {
             const resultDiv = document.getElementById('keyResult');
             try {
-                const response = await fetch(`${API_BASE}/api/createkey?expiredate=30`);
+                const response = await fetch(`${API_BASE}/api/expiredate=${days}&createkey`);
                 const data = await response.json();
                 
                 if (data.success) {
                     resultDiv.innerHTML = `
                         <div class="success">
                             <strong>✅ API Key Generated Successfully!</strong><br>
-                            <strong>Key:</strong> ${data.api_key}<br>
+                            <div class="key-badge"><strong>Key:</strong> ${data.api_key}</div>
+                            <strong>Valid for:</strong> ${data.valid_days} days<br>
                             <strong>Expires:</strong> ${new Date(data.expiry_date).toLocaleString()}<br>
                             <small>⚠️ Save this key securely. You won't see it again!</small>
                         </div>
                     `;
                     document.getElementById('apiKey').value = data.api_key;
                 } else {
-                    resultDiv.innerHTML = `<div class="error">❌ Failed to generate API key</div>`;
+                    resultDiv.innerHTML = `<div class="error">❌ Failed to generate API key: ${data.error}</div>`;
                 }
                 resultDiv.classList.add('show');
             } catch (error) {
@@ -251,7 +281,7 @@
                         <div class="success">
                             <strong>✅ Download Successful!</strong><br>
                             <strong>Platform:</strong> ${data.platform}<br>
-                            <strong>Data:</strong> <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                            <strong>Response:</strong> <pre style="background:#f0f0f0; padding:10px; overflow-x:auto;">${JSON.stringify(data.data, null, 2)}</pre>
                         </div>
                     `;
                 } else {
