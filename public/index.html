@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>TNEH Video Downloader API</title>
     <style>
         * {
@@ -10,207 +10,384 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-        
-        .header {
-            text-align: center;
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            background: #f0f0f0;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            margin-bottom: 40px;
         }
-        
-        .header h1 {
-            font-size: 3em;
-            margin-bottom: 10px;
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
-        
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
+
+        /* Cards */
         .card {
             background: white;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 30px;
             margin-bottom: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
         }
-        
+
+        .card.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .card h2 {
             color: #667eea;
             margin-bottom: 20px;
         }
-        
-        .endpoint {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            font-family: monospace;
-        }
-        
-        .endpoint-url {
-            color: #667eea;
-            font-weight: bold;
-        }
-        
-        .method {
-            display: inline-block;
-            background: #4CAF50;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 0.8em;
-            margin-right: 10px;
-        }
-        
-        input, select, button {
-            padding: 10px 15px;
+
+        /* Forms */
+        input, select, textarea {
+            padding: 12px 15px;
             margin: 10px 5px;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 1em;
+            width: 100%;
+            max-width: 350px;
         }
-        
-        input {
-            width: 300px;
-        }
-        
-        select {
-            background: white;
-            cursor: pointer;
-        }
-        
+
         button {
-            background: #667eea;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 1em;
             transition: transform 0.2s;
         }
-        
+
         button:hover {
             transform: translateY(-2px);
         }
-        
+
         .result {
             margin-top: 20px;
             padding: 15px;
             background: #f9f9f9;
-            border-radius: 5px;
+            border-radius: 8px;
             display: none;
             overflow-x: auto;
         }
-        
+
         .result.show {
             display: block;
         }
-        
-        .error {
-            color: red;
-        }
-        
-        .success {
-            color: green;
-        }
-        
+
+        .error { color: red; }
+        .success { color: green; }
+
         .key-badge {
             background: #e0e7ff;
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 10px;
+            border-radius: 8px;
             font-family: monospace;
-            font-size: 0.9em;
-            margin: 5px 0;
+            margin: 10px 0;
         }
-        
-        .footer {
+
+        /* Pricing Cards */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .pricing-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #fff 100%);
+            padding: 25px;
+            border-radius: 15px;
             text-align: center;
-            color: white;
-            margin-top: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
         }
-        
-        .button-group {
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .price {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 15px 0;
+        }
+
+        .payment-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .transaction-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
+            gap: 10px;
         }
-        
+
+        .confirm-btn {
+            background: #28a745;
+            padding: 8px 15px;
+        }
+
+        .reject-btn {
+            background: #dc3545;
+            padding: 8px 15px;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            input {
-                width: 100%;
+            .nav {
+                flex-direction: column;
             }
+            .nav-links {
+                justify-content: center;
+            }
+            input {
+                max-width: 100%;
+            }
+        }
+
+        /* 3D Button */
+        .nevegeson-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        .nevegeson-btn:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+
+        .nevegeson-btn span {
+            font-size: 30px;
+        }
+
+        .profile-info {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .admin-badge {
+            background: #ffc107;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🎥 TNEH Video Downloader API</h1>
-            <p>Download videos from TikTok, Facebook, Instagram, and YouTube</p>
-        </div>
-        
-        <div class="card">
-            <h2>📋 API Endpoints</h2>
-            <div class="endpoint">
-                <span class="method">GET</span>
-                <span class="endpoint-url">/api/health</span>
-                <p>Check API health status</p>
-            </div>
-            <div class="endpoint">
-                <span class="method">GET</span>
-                <span class="endpoint-url">/api/expiredate=7&createkey</span>
-                <p>Generate API key (valid for 7 days)</p>
-            </div>
-            <div class="endpoint">
-                <span class="method">GET</span>
-                <span class="endpoint-url">/api/expiredate=30&createkey</span>
-                <p>Generate API key (valid for 30 days)</p>
-            </div>
-            <div class="endpoint">
-                <span class="method">GET</span>
-                <span class="endpoint-url">/api/TikTok?key=YOUR_KEY&url=VIDEO_URL</span>
-                <p>Download TikTok video</p>
-            </div>
-            <div class="endpoint">
-                <span class="method">GET</span>
-                <span class="endpoint-url">/api/Facebook?key=YOUR_KEY&url=VIDEO_URL</span>
-                <p>Download Facebook video</p>
-            </div>
-            <div class="endpoint">
-                <span class="method">GET</span>
-                <span class="endpoint-url">/api/Instagram?key=YOUR_KEY&url=VIDEO_URL</span>
-                <p>Download Instagram video</p>
-            </div>
-            <div class="endpoint">
-                <span class="method">GET</span>
-                <span class="endpoint-url">/api/YouTube?key=YOUR_KEY&url=VIDEO_URL</span>
-                <p>Download YouTube video</p>
+        <!-- Navigation -->
+        <div class="nav">
+            <div class="logo">🎥 TNEH Downloader</div>
+            <div class="nav-links">
+                <button class="nav-btn" onclick="showPage('home')">🏠 Home</button>
+                <button class="nav-btn" onclick="showPage('api')">📡 API Page</button>
+                <button class="nav-btn" onclick="showPage('buy')">💰 Buy Key</button>
+                <button class="nav-btn" onclick="showPage('mykeys')">🔑 My Keys</button>
+                <button class="nav-btn" onclick="showPage('downloader')">📥 Downloader</button>
+                <button class="nav-btn" onclick="showPage('profile')">👤 Profile</button>
             </div>
         </div>
-        
-        <div class="card">
-            <h2>🔑 Get Your API Key</h2>
-            <div class="button-group">
-                <button onclick="getApiKey(7)">Generate Key (7 days)</button>
-                <button onclick="getApiKey(30)">Generate Key (30 days)</button>
-            </div>
-            <div id="keyResult" class="result"></div>
+
+        <!-- Home Page -->
+        <div id="homePage" class="card">
+            <h2>🏠 Welcome to TNEH Video Downloader</h2>
+            <p>Download videos from TikTok, Facebook, Instagram, and YouTube with our powerful API.</p>
+            <br>
+            <h3>Features:</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>✓ TikTok Video Downloader</li>
+                <li>✓ Facebook Video Downloader</li>
+                <li>✓ Instagram Video Downloader</li>
+                <li>✓ YouTube Video Downloader</li>
+                <li>✓ High Quality Downloads</li>
+                <li>✓ Fast API Response</li>
+                <li>✓ 24/7 Support</li>
+            </ul>
+            <br>
+            <button onclick="showPage('buy')">Get API Key Now</button>
         </div>
-        
-        <div class="card">
-            <h2>📥 Test Download</h2>
-            <select id="platform" style="padding: 10px; margin: 10px 5px;">
+
+        <!-- API Page -->
+        <div id="apiPage" class="card">
+            <h2>📡 API Documentation</h2>
+            <div class="endpoint">
+                <strong>Base URL:</strong> https://tnehvideodwonloaderapi.onrender.com
+            </div>
+            <div class="endpoint">
+                <strong>GET</strong> - Generate 7-day key
+            </div>
+            <div class="endpoint">
+                <strong>GET</strong> - Generate 30-day key
+            </div>
+            <div class="endpoint">
+                <strong>GET</strong> /api/TikTok?key=YOUR_KEY&url=VIDEO_URL
+            </div>
+            <div class="endpoint">
+                <strong>GET</strong> /api/Facebook?key=YOUR_KEY&url=VIDEO_URL
+            </div>
+            <div class="endpoint">
+                <strong>GET</strong> /api/Instagram?key=YOUR_KEY&url=VIDEO_URL
+            </div>
+            <div class="endpoint">
+                <strong>GET</strong> /api/YouTube?key=YOUR_KEY&url=VIDEO_URL
+            </div>
+        </div>
+
+        <!-- Buy Key Page -->
+        <div id="buyPage" class="card">
+            <h2>💰 Purchase API Key</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card" onclick="selectPlan(7, 20)">
+                    <h3>7 Days Plan</h3>
+                    <div class="price">20 BDT</div>
+                    <p>✓ Valid for 7 days</p>
+                    <p>✓ Unlimited requests</p>
+                    <p>✓ All platforms</p>
+                </div>
+                <div class="pricing-card" onclick="selectPlan(30, 50)">
+                    <h3>30 Days Plan</h3>
+                    <div class="price">50 BDT</div>
+                    <p>✓ Valid for 30 days</p>
+                    <p>✓ Unlimited requests</p>
+                    <p>✓ All platforms</p>
+                    <p>✓ Priority support</p>
+                </div>
+            </div>
+
+            <div id="paymentSection" style="display: none; margin-top: 30px;">
+                <h3>Payment Details</h3>
+                <div class="payment-info">
+                    <p><strong>📱 bKash/Nagad:</strong> 01869325626</p>
+                    <p><strong>Reference:</strong> TNEH KEY</p>
+                    <p><strong>Amount:</strong> <span id="amountDisplay">0</span> BDT</p>
+                </div>
+                <input type="text" id="transactionId" placeholder="Enter Transaction ID">
+                <input type="text" id="paymentNumber" placeholder="Your Payment Number">
+                <button onclick="submitPayment()">Submit Payment Proof</button>
+                <div id="paymentResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- My Keys Page -->
+        <div id="mykeysPage" class="card">
+            <h2>🔑 My API Keys</h2>
+            <div id="keysList" class="keys-list"></div>
+        </div>
+
+        <!-- Downloader Page -->
+        <div id="downloaderPage" class="card">
+            <h2>📥 Video Downloader</h2>
+            <select id="platform">
                 <option value="TikTok">TikTok</option>
                 <option value="Facebook">Facebook</option>
                 <option value="Instagram">Instagram</option>
@@ -221,42 +398,138 @@
             <button onclick="downloadVideo()">Download Video</button>
             <div id="downloadResult" class="result"></div>
         </div>
-        
-        <div class="footer">
-            <p>© 2024 TNEH Video Downloader API | Powered by Node.js</p>
+
+        <!-- Profile Page -->
+        <div id="profilePage" class="card">
+            <h2>👤 My Profile</h2>
+            <div id="profileInfo"></div>
+            <div id="adminPanel" style="display: none;">
+                <div class="admin-panel">
+                    <h3>🔧 Admin Panel</h3>
+                    <button onclick="showAdminTransactions()">View Pending Transactions</button>
+                    <div id="adminTransactions" class="transaction-list" style="margin-top: 20px;"></div>
+                </div>
+            </div>
         </div>
     </div>
-    
+
+    <!-- 3D Mobile App Navigation Button -->
+    <div class="nevegeson-btn" onclick="openAppUrl()">
+        <span>📱</span>
+    </div>
+
     <script>
+        // API Base URL
         const API_BASE = 'https://tnehvideodwonloaderapi.onrender.com';
         
-        async function getApiKey(days) {
-            const resultDiv = document.getElementById('keyResult');
-            try {
-                const response = await fetch(`${API_BASE}/api/expiredate=${days}&createkey`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    resultDiv.innerHTML = `
-                        <div class="success">
-                            <strong>✅ API Key Generated Successfully!</strong><br>
-                            <div class="key-badge"><strong>Key:</strong> ${data.api_key}</div>
-                            <strong>Valid for:</strong> ${data.valid_days} days<br>
-                            <strong>Expires:</strong> ${new Date(data.expiry_date).toLocaleString()}<br>
-                            <small>⚠️ Save this key securely. You won't see it again!</small>
-                        </div>
-                    `;
-                    document.getElementById('apiKey').value = data.api_key;
-                } else {
-                    resultDiv.innerHTML = `<div class="error">❌ Failed to generate API key: ${data.error}</div>`;
-                }
-                resultDiv.classList.add('show');
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
-                resultDiv.classList.add('show');
-            }
-        }
+        // Admin credentials
+        const ADMIN_EMAIL = 'md3173505@gmail.com';
+        const ADMIN_PASSWORD = 'Nomanfff5';
         
+        // Storage
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        let pendingTransactions = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
+        let userKeys = JSON.parse(localStorage.getItem('userKeys') || '{}');
+
+        // Check if admin is logged in
+        function isAdmin() {
+            return currentUser && currentUser.email === ADMIN_EMAIL;
+        }
+
+        // Show/Hide pages
+        function showPage(page) {
+            const pages = ['homePage', 'apiPage', 'buyPage', 'mykeysPage', 'downloaderPage', 'profilePage'];
+            pages.forEach(p => {
+                document.getElementById(p).classList.remove('active');
+            });
+            document.getElementById(page + 'Page').classList.add('active');
+            
+            if (page === 'mykeysPage') loadMyKeys();
+            if (page === 'profilePage') loadProfile();
+        }
+
+        // Select payment plan
+        let selectedDays = 0;
+        let selectedAmount = 0;
+        
+        function selectPlan(days, amount) {
+            selectedDays = days;
+            selectedAmount = amount;
+            document.getElementById('paymentSection').style.display = 'block';
+            document.getElementById('amountDisplay').innerText = amount;
+        }
+
+        // Submit payment
+        function submitPayment() {
+            const transactionId = document.getElementById('transactionId').value;
+            const paymentNumber = document.getElementById('paymentNumber').value;
+            
+            if (!transactionId || !paymentNumber) {
+                showResult('paymentResult', 'Please fill all fields', 'error');
+                return;
+            }
+            
+            if (!currentUser) {
+                showResult('paymentResult', 'Please login first', 'error');
+                setTimeout(() => showLoginModal(), 2000);
+                return;
+            }
+            
+            const transaction = {
+                id: Date.now(),
+                userId: currentUser.email,
+                transactionId: transactionId,
+                paymentNumber: paymentNumber,
+                days: selectedDays,
+                amount: selectedAmount,
+                status: 'pending',
+                timestamp: new Date().toISOString()
+            };
+            
+            pendingTransactions.push(transaction);
+            localStorage.setItem('pendingTransactions', JSON.stringify(pendingTransactions));
+            
+            showResult('paymentResult', 'Payment submitted! Wait for admin confirmation.', 'success');
+            document.getElementById('transactionId').value = '';
+            document.getElementById('paymentNumber').value = '';
+            document.getElementById('paymentSection').style.display = 'none';
+        }
+
+        // Load my keys
+        function loadMyKeys() {
+            if (!currentUser) {
+                document.getElementById('keysList').innerHTML = '<p>Please login to view your keys</p><button onclick="showLoginModal()">Login</button>';
+                return;
+            }
+            
+            const keys = userKeys[currentUser.email] || [];
+            if (keys.length === 0) {
+                document.getElementById('keysList').innerHTML = '<p>No API keys yet. <button onclick="showPage(\'buy\')">Buy a key</button></p>';
+                return;
+            }
+            
+            let html = '';
+            keys.forEach(key => {
+                html += `
+                    <div class="key-badge">
+                        <strong>Key:</strong> ${key.api_key}<br>
+                        <strong>Expires:</strong> ${new Date(key.expiry_date).toLocaleString()}<br>
+                        <strong>Status:</strong> ${new Date(key.expiry_date) > new Date() ? '✅ Active' : '❌ Expired'}<br>
+                        <button onclick="copyKey('${key.api_key}')">Copy Key</button>
+                    </div>
+                `;
+            });
+            document.getElementById('keysList').innerHTML = html;
+        }
+
+        // Copy key to clipboard
+        function copyKey(key) {
+            navigator.clipboard.writeText(key);
+            alert('API Key copied to clipboard!');
+        }
+
+        // Download video
         async function downloadVideo() {
             const platform = document.getElementById('platform').value;
             const apiKey = document.getElementById('apiKey').value;
@@ -264,33 +537,218 @@
             const resultDiv = document.getElementById('downloadResult');
             
             if (!apiKey || !videoUrl) {
-                resultDiv.innerHTML = `<div class="error">❌ Please provide both API Key and Video URL</div>`;
-                resultDiv.classList.add('show');
+                showResult('downloadResult', 'Please provide API Key and Video URL', 'error');
                 return;
             }
             
-            resultDiv.innerHTML = `<div>⏳ Downloading video...</div>`;
-            resultDiv.classList.add('show');
+            showResult('downloadResult', 'Downloading video...', 'info');
             
             try {
-                const response = await fetch(`${API_BASE}/api/${platform}?key=${encodeURIComponent(apiKey)}&url=${encodeURIComponent(videoUrl)}`);
+                const response = await fetch(`${API_BASE}/api/${platform}?key=${apiKey}&url=${encodeURIComponent(videoUrl)}`);
                 const data = await response.json();
                 
                 if (data.success) {
-                    resultDiv.innerHTML = `
-                        <div class="success">
-                            <strong>✅ Download Successful!</strong><br>
-                            <strong>Platform:</strong> ${data.platform}<br>
-                            <strong>Response:</strong> <pre style="background:#f0f0f0; padding:10px; overflow-x:auto;">${JSON.stringify(data.data, null, 2)}</pre>
-                        </div>
-                    `;
+                    resultDiv.innerHTML = `<div class="success"><strong>✅ Success!</strong><br><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
                 } else {
                     resultDiv.innerHTML = `<div class="error">❌ Error: ${data.error}</div>`;
                 }
+                resultDiv.classList.add('show');
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                showResult('downloadResult', 'Error: ' + error.message, 'error');
             }
         }
+
+        // Load profile
+        function loadProfile() {
+            if (!currentUser) {
+                document.getElementById('profileInfo').innerHTML = `
+                    <div class="profile-info">
+                        <p>Not logged in</p>
+                        <button onclick="showLoginModal()">Login</button>
+                        <button onclick="showRegisterModal()">Register</button>
+                    </div>
+                `;
+                document.getElementById('adminPanel').style.display = 'none';
+                return;
+            }
+            
+            let adminHtml = '';
+            if (isAdmin()) {
+                adminHtml = '<span class="admin-badge">👑 Admin</span>';
+            }
+            
+            document.getElementById('profileInfo').innerHTML = `
+                <div class="profile-info">
+                    <p><strong>Email:</strong> ${currentUser.email} ${adminHtml}</p>
+                    <p><strong>Member Since:</strong> ${new Date(currentUser.joinDate).toLocaleDateString()}</p>
+                    <button onclick="logout()">Logout</button>
+                </div>
+            `;
+            
+            document.getElementById('adminPanel').style.display = isAdmin() ? 'block' : 'none';
+        }
+
+        // Show admin transactions
+        function showAdminTransactions() {
+            const pending = pendingTransactions.filter(t => t.status === 'pending');
+            if (pending.length === 0) {
+                document.getElementById('adminTransactions').innerHTML = '<p>No pending transactions</p>';
+                return;
+            }
+            
+            let html = '<h4>Pending Transactions:</h4>';
+            pending.forEach(t => {
+                html += `
+                    <div class="transaction-item">
+                        <div>
+                            <strong>User:</strong> ${t.userId}<br>
+                            <strong>Transaction ID:</strong> ${t.transactionId}<br>
+                            <strong>Amount:</strong> ${t.amount} BDT (${t.days} days)<br>
+                            <strong>Payment #:</strong> ${t.paymentNumber}
+                        </div>
+                        <div>
+                            <button class="confirm-btn" onclick="confirmTransaction(${t.id})">✅ Confirm</button>
+                            <button class="reject-btn" onclick="rejectTransaction(${t.id})">❌ Reject</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('adminTransactions').innerHTML = html;
+        }
+
+        // Confirm transaction and generate key
+        function confirmTransaction(transactionId) {
+            const transaction = pendingTransactions.find(t => t.id === transactionId);
+            if (!transaction) return;
+            
+            // Generate API key
+            const apiKey = 'TNEH-' + Math.random().toString(36).substring(2, 15) + 
+                           Math.random().toString(36).substring(2, 8).toUpperCase();
+            
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + transaction.days);
+            
+            // Save key to user
+            if (!userKeys[transaction.userId]) {
+                userKeys[transaction.userId] = [];
+            }
+            userKeys[transaction.userId].push({
+                api_key: apiKey,
+                expiry_date: expiryDate.toISOString(),
+                days: transaction.days,
+                generated: new Date().toISOString()
+            });
+            
+            // Update transaction status
+            transaction.status = 'confirmed';
+            transaction.apiKey = apiKey;
+            localStorage.setItem('pendingTransactions', JSON.stringify(pendingTransactions));
+            localStorage.setItem('userKeys', JSON.stringify(userKeys));
+            
+            alert(`Key generated: ${apiKey}\nValid for ${transaction.days} days`);
+            showAdminTransactions();
+        }
+
+        // Reject transaction
+        function rejectTransaction(transactionId) {
+            const transaction = pendingTransactions.find(t => t.id === transactionId);
+            if (transaction) {
+                transaction.status = 'rejected';
+                localStorage.setItem('pendingTransactions', JSON.stringify(pendingTransactions));
+                alert('Transaction rejected');
+                showAdminTransactions();
+            }
+        }
+
+        // Login Modal
+        function showLoginModal() {
+            const email = prompt('Enter your email:');
+            if (!email) return;
+            const password = prompt('Enter your password:');
+            if (!password) return;
+            
+            // Admin login
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                currentUser = { email: ADMIN_EMAIL, joinDate: new Date().toISOString(), isAdmin: true };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                alert('Admin login successful!');
+                loadProfile();
+                showPage('profile');
+                return;
+            }
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                alert('Login successful!');
+                loadProfile();
+                showPage('profile');
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+
+        // Register Modal
+        function showRegisterModal() {
+            const email = prompt('Enter your email:');
+            if (!email) return;
+            const password = prompt('Enter your password:');
+            if (!password) return;
+            
+            if (users.find(u => u.email === email)) {
+                alert('User already exists!');
+                return;
+            }
+            
+            const newUser = {
+                email: email,
+                password: password,
+                joinDate: new Date().toISOString()
+            };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            alert('Registration successful!');
+            loadProfile();
+            showPage('profile');
+        }
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            alert('Logged out successfully!');
+            loadProfile();
+            showPage('home');
+        }
+
+        // Open 3D app URL
+        function openAppUrl() {
+            window.open('https://tnehvideodwonloader.edgeone.app/', '_blank');
+        }
+
+        // Show result helper
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="${type}">${message}</div>`;
+            element.classList.add('show');
+            setTimeout(() => {
+                element.classList.remove('show');
+            }, 5000);
+        }
+
+        // Initialize
+        function init() {
+            if (!currentUser) {
+                showPage('home');
+            } else {
+                showPage('profile');
+            }
+        }
+
+        init();
     </script>
 </body>
 </html>
