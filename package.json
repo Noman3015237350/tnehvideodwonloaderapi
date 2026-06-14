@@ -1,7 +1,7 @@
 {
-  "name": "tneh-video-downloader",
+  "name": "tneh-video-downloader-api",
   "version": "1.0.0",
-  "description": "TNEH Social Media Video Downloader API - Support TikTok, Facebook, Instagram, YouTube",
+  "description": "TNEH All Social Media Video Downloader API",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
@@ -11,13 +11,9 @@
     "express": "^4.18.2",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
-    "helmet": "^7.0.0",
-    "rate-limit": "^2.2.0"
+    "helmet": "^7.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
-  },
-  "keywords": ["video-downloader", "tiktok", "facebook", "instagram", "youtube", "api"],
-  "author": "TNEH",
-  "license": "MIT"
+  }
 }
