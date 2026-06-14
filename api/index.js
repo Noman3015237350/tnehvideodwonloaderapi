@@ -12,8 +12,19 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// API Keys storage (in production, use database)
+// API Keys storage
 const validKeys = new Map();
+
+// Developer Info
+const DEVELOPER_INFO = {
+  api_developer: "TNEH GROUP",
+  api_name: "SOCIAL DL - All-in-One Media Downloader API",
+  api_version: "1.0.0",
+  dev_github: "https://github.com/md30152373",
+  dev_telegram: "https://t.me/tneh_owner",
+  dev_website: "https://tnehvideodwonloader.edgeone.app/",
+  dev_whatsapp: "https://wa.me/1611229803"
+};
 
 // Generate API Key
 function generateApiKey() {
@@ -28,17 +39,33 @@ function isKeyValid(key) {
   return new Date() < expiryDate;
 }
 
+// Transform response to match required format
+function transformResponse(data, platform) {
+  if (data && data.result) {
+    return {
+      developer: DEVELOPER_INFO,
+      platform: platform,
+      result: data.result,
+      success: true
+    };
+  }
+  return {
+    developer: DEVELOPER_INFO,
+    platform: platform,
+    result: data,
+    success: true
+  };
+}
+
 // TikTok Downloader
 async function downloadTikTok(url) {
   try {
     const response = await axios.get(`https://social-dl.lmnx9.workers.dev?url=${encodeURIComponent(url)}`);
-    return {
-      success: true,
-      platform: 'TikTok',
-      data: response.data
-    };
+    return transformResponse(response.data, "tiktok");
   } catch (error) {
     return {
+      developer: DEVELOPER_INFO,
+      platform: "tiktok",
       success: false,
       error: 'Failed to download TikTok video'
     };
@@ -49,13 +76,11 @@ async function downloadTikTok(url) {
 async function downloadFacebook(url) {
   try {
     const response = await axios.get(`https://social-dl.lmnx9.workers.dev?url=${encodeURIComponent(url)}`);
-    return {
-      success: true,
-      platform: 'Facebook',
-      data: response.data
-    };
+    return transformResponse(response.data, "facebook");
   } catch (error) {
     return {
+      developer: DEVELOPER_INFO,
+      platform: "facebook",
       success: false,
       error: 'Failed to download Facebook video'
     };
@@ -66,13 +91,11 @@ async function downloadFacebook(url) {
 async function downloadInstagram(url) {
   try {
     const response = await axios.get(`https://social-dl.lmnx9.workers.dev?url=${encodeURIComponent(url)}`);
-    return {
-      success: true,
-      platform: 'Instagram',
-      data: response.data
-    };
+    return transformResponse(response.data, "instagram");
   } catch (error) {
     return {
+      developer: DEVELOPER_INFO,
+      platform: "instagram",
       success: false,
       error: 'Failed to download Instagram video'
     };
@@ -85,12 +108,15 @@ async function downloadYouTube(url) {
     const response = await axios.get(`https://api.lmnx9.shop/download/youtube.php?url=${encodeURIComponent(url)}`);
     return {
       success: true,
-      platform: 'YouTube',
+      developer: "TNEH GROUP",
+      telegram: "@tneh_owner",
       data: response.data
     };
   } catch (error) {
     return {
       success: false,
+      developer: "TNEH GROUP",
+      telegram: "@tneh_owner",
       error: 'Failed to download YouTube video'
     };
   }
@@ -103,6 +129,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'active',
     timestamp: new Date().toISOString(),
+    developer: DEVELOPER_INFO,
     endpoints: [
       '/api/expiredate=7&createkey',
       '/api/expiredate=30&createkey',
@@ -136,14 +163,15 @@ app.get('/api/expiredate=:days&createkey', (req, res) => {
     api_key: apiKey,
     expiry_date: expiryDate.toISOString(),
     valid_days: days,
+    developer: DEVELOPER_INFO,
     message: `API key generated successfully. Valid for ${days} days.`
   });
 });
 
-// Alternative: Support both formats (for backward compatibility)
+// Alternative format
 app.get('/api/createkey', (req, res) => {
   const { expiredate } = req.query;
-  let days = 30; // default
+  let days = 30;
   
   if (expiredate && !isNaN(parseInt(expiredate))) {
     days = parseInt(expiredate);
@@ -160,6 +188,7 @@ app.get('/api/createkey', (req, res) => {
     api_key: apiKey,
     expiry_date: expiryDate.toISOString(),
     valid_days: days,
+    developer: DEVELOPER_INFO,
     message: `API key generated successfully. Valid for ${days} days.`
   });
 });
@@ -171,14 +200,16 @@ app.get('/api/TikTok', async (req, res) => {
   if (!key || !url) {
     return res.status(400).json({
       success: false,
-      error: 'Missing required parameters: key and url'
+      error: 'Missing required parameters: key and url',
+      developer: DEVELOPER_INFO
     });
   }
   
   if (!isKeyValid(key)) {
     return res.status(401).json({
       success: false,
-      error: 'Invalid or expired API key'
+      error: 'Invalid or expired API key',
+      developer: DEVELOPER_INFO
     });
   }
   
@@ -193,14 +224,16 @@ app.get('/api/Facebook', async (req, res) => {
   if (!key || !url) {
     return res.status(400).json({
       success: false,
-      error: 'Missing required parameters: key and url'
+      error: 'Missing required parameters: key and url',
+      developer: DEVELOPER_INFO
     });
   }
   
   if (!isKeyValid(key)) {
     return res.status(401).json({
       success: false,
-      error: 'Invalid or expired API key'
+      error: 'Invalid or expired API key',
+      developer: DEVELOPER_INFO
     });
   }
   
@@ -215,14 +248,16 @@ app.get('/api/Instagram', async (req, res) => {
   if (!key || !url) {
     return res.status(400).json({
       success: false,
-      error: 'Missing required parameters: key and url'
+      error: 'Missing required parameters: key and url',
+      developer: DEVELOPER_INFO
     });
   }
   
   if (!isKeyValid(key)) {
     return res.status(401).json({
       success: false,
-      error: 'Invalid or expired API key'
+      error: 'Invalid or expired API key',
+      developer: DEVELOPER_INFO
     });
   }
   
@@ -237,14 +272,18 @@ app.get('/api/YouTube', async (req, res) => {
   if (!key || !url) {
     return res.status(400).json({
       success: false,
-      error: 'Missing required parameters: key and url'
+      error: 'Missing required parameters: key and url',
+      developer: "TNEH GROUP",
+      telegram: "@tneh_owner"
     });
   }
   
   if (!isKeyValid(key)) {
     return res.status(401).json({
       success: false,
-      error: 'Invalid or expired API key'
+      error: 'Invalid or expired API key',
+      developer: "TNEH GROUP",
+      telegram: "@tneh_owner"
     });
   }
   
